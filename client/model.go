@@ -3,6 +3,7 @@ package client
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/rcrowley/go-metrics"
 	"io/ioutil"
 	"math"
 	"net"
@@ -17,8 +18,6 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
-
-	"github.com/rcrowley/go-metrics"
 )
 
 const (
@@ -56,6 +55,7 @@ type ClientModel struct {
 	TLS           bool
 	TLSClientCrt  string
 	TLSClientKey  string
+	HostHeader    string
 }
 
 func newClientModel(config *Configuration, ctl mvc.Controller) *ClientModel {
@@ -247,7 +247,7 @@ func (c *ClientModel) control() {
 		// simple non-proxied case, just connect to the server
 		ctlConn, err = conn.Dial(c.serverAddr, "ctl", c.tlsConfig)
 	} else {
-		ctlConn, err = conn.DialHttpProxy(c.proxyUrl, c.serverAddr, "ctl", c.tlsConfig)
+		ctlConn, err = conn.DialHttpProxy(c.proxyUrl, c.serverAddr, "ctl", c.tlsConfig, c.HostHeader)
 	}
 	if err != nil {
 		panic(err)
@@ -305,6 +305,7 @@ func (c *ClientModel) control() {
 			Subdomain:  config.Subdomain,
 			HttpAuth:   config.HttpAuth,
 			RemotePort: config.RemotePort,
+			HostHeader: config.HostHeader,
 		}
 
 		// send the tunnel request
@@ -370,7 +371,7 @@ func (c *ClientModel) proxy() {
 	if c.proxyUrl == "" {
 		remoteConn, err = conn.Dial(c.serverAddr, "pxy", c.tlsConfig)
 	} else {
-		remoteConn, err = conn.DialHttpProxy(c.proxyUrl, c.serverAddr, "pxy", c.tlsConfig)
+		remoteConn, err = conn.DialHttpProxy(c.proxyUrl, c.serverAddr, "pxy", c.tlsConfig, c.HostHeader)
 	}
 
 	if err != nil {

@@ -3,7 +3,6 @@ package client
 import (
 	"fmt"
 	"github.com/phayes/freeport"
-	"gopkg.in/yaml.v1"
 	"io/ioutil"
 	"net"
 	"net/url"
@@ -36,6 +35,7 @@ type TunnelConfiguration struct {
 	Protocols  map[string]string `yaml:"proto,omitempty"`
 	HttpAuth   string            `yaml:"auth,omitempty"`
 	RemotePort uint16            `yaml:"remote_port,omitempty"`
+	HostHeader string            `yaml:"host_header,omitempty"`
 }
 
 func LoadConfiguration(opts *Options) (config *Configuration, err error) {
@@ -171,10 +171,11 @@ func LoadConfiguration(opts *Options) (config *Configuration, err error) {
 	case "default":
 		config.Tunnels = make(map[string]*TunnelConfiguration)
 		config.Tunnels["default"] = &TunnelConfiguration{
-			Subdomain: opts.subdomain,
-			Hostname:  opts.hostname,
-			HttpAuth:  opts.httpauth,
-			Protocols: make(map[string]string),
+			Subdomain:  opts.subdomain,
+			Hostname:   opts.hostname,
+			HttpAuth:   opts.httpauth,
+			Protocols:  make(map[string]string),
+			HostHeader: opts.hostHeader,
 		}
 
 		for _, proto := range strings.Split(opts.protocol, "+") {
@@ -194,6 +195,7 @@ func LoadConfiguration(opts *Options) (config *Configuration, err error) {
 				Protocols: map[string]string{
 					"http": config.InspectAddr,
 				},
+				HostHeader: opts.hostHeader,
 			}
 		}
 

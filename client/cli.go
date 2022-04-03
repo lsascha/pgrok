@@ -51,6 +51,7 @@ type Options struct {
 	tls           bool
 	tlsClientCrt  string
 	tlsClientKey  string
+	hostHeader    string
 	args          []string
 }
 
@@ -131,6 +132,11 @@ func ParseArgs() (opts *Options, err error) {
 		false,
 		"Should export inspector to public access")
 
+	hostHeader := flag.String(
+		"host-header",
+		"",
+		"Rewrite the Host header (HTTP only)")
+
 	flag.Parse()
 
 	opts = &Options{
@@ -148,6 +154,7 @@ func ParseArgs() (opts *Options, err error) {
 		tls:           *tls,
 		tlsClientCrt:  *tlsClientCrt,
 		tlsClientKey:  *tlsClientKey,
+		hostHeader:    *hostHeader,
 		command:       flag.Arg(0),
 	}
 

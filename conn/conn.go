@@ -104,7 +104,7 @@ func Dial(addr, typ string, tlsCfg *tls.Config) (conn *loggedConn, err error) {
 	return
 }
 
-func DialHttpProxy(proxyUrl, addr, typ string, tlsCfg *tls.Config) (conn *loggedConn, err error) {
+func DialHttpProxy(proxyUrl, addr, typ string, tlsCfg *tls.Config, hostHeader string) (conn *loggedConn, err error) {
 	// parse the proxy address
 	var parsedUrl *url.URL
 	if parsedUrl, err = url.Parse(proxyUrl); err != nil {
@@ -142,6 +142,13 @@ func DialHttpProxy(proxyUrl, addr, typ string, tlsCfg *tls.Config) (conn *logged
 		req.Header.Set("Proxy-Authorization", proxyAuth)
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; pgrok)")
+
+	// rewrite host-header
+	if hostHeader != "" {
+		//req.Header.Set("Host", hostHeader)
+		req.Host = hostHeader
+	}
+
 	req.Write(conn)
 
 	// read the proxy's response

@@ -136,6 +136,7 @@ func (c *Control) registerTunnel(rawTunnelReq *msg.ReqTunnel) {
 			Subdomain:  rawTunnelReq.Subdomain,
 			HttpAuth:   rawTunnelReq.HttpAuth,
 			RemotePort: rawTunnelReq.RemotePort,
+			HostHeader: rawTunnelReq.HostHeader,
 		}
 
 		c.conn.Debug("Registering new tunnel")
